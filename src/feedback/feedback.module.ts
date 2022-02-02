@@ -1,16 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { FeedbackController } from './feedback.controller';
 import { FeedbackService } from './feedback.service';
-import { Feedback, FeedbackSchema } from './schemas/feedback.schema';
+import { Feedback } from './feedback.model';
 
 @Module({
   providers: [FeedbackService],
   controllers: [FeedbackController],
-  imports: [
-    MongooseModule.forFeature([
-      { name: Feedback.name, schema: FeedbackSchema },
-    ]),
-  ],
+  imports: [SequelizeModule.forFeature([Feedback])],
 })
 export class FeedbackModule {}

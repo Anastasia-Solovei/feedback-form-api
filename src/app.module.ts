@@ -1,15 +1,27 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { FeedbackModule } from './feedback/feedback.module';
-require('dotenv').config();
-
-const uri = process.env.DB_HOST;
+import { Feedback } from './feedback/feedback.model';
 
 @Module({
-  imports: [FeedbackModule, MongooseModule.forRoot(`${uri}`)],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: `.${process.env.NODE_ENV}.env`,
+    }),
+    SequelizeModule.forRoot({
+      dialect: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USERNAME,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+      models: [Feedback],
+      autoLoadModels: true,
+    }),
+    FeedbackModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

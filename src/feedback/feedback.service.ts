@@ -1,25 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/sequelize';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { Feedback, FeedbackDocument } from './schemas/feedback.schema';
+import { Feedback } from './feedback.model';
 
 @Injectable()
 export class FeedbackService {
   constructor(
-    @InjectModel(Feedback.name) private feedbackModel: Model<FeedbackDocument>,
+    @InjectModel(Feedback) private feedbackRepository: typeof Feedback,
   ) {}
 
-  async getAll(): Promise<Feedback[]> {
-    return this.feedbackModel.find().exec();
+  async getAll() {
+    const allFeedback = await this.feedbackRepository.findAll();
+    return allFeedback;
   }
 
-  async getById(id: string): Promise<Feedback> {
-    return this.feedbackModel.findById(id);
-  }
-
-  async create(feedbackDto: CreateFeedbackDto): Promise<Feedback> {
-    const newFeedback = new this.feedbackModel(feedbackDto);
-    return newFeedback.save();
+  async create(dto: CreateFeedbackDto) {
+    const newFeedback = await this.feedbackRepository.create(dto);
+    return newFeedback;
   }
 }

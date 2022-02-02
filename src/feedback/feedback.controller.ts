@@ -4,33 +4,34 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Header,
-  Param,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { Feedback } from './feedback.model';
 import { FeedbackService } from './feedback.service';
-import { Feedback } from './schemas/feedback.schema';
 
+@ApiTags('Feedback')
 @Controller('feedback')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
+  @ApiOperation({ summary: 'Get a list of feedback' })
+  @ApiResponse({ status: 200, type: [Feedback] })
   @Get()
   @HttpCode(HttpStatus.OK)
-  getAll(): Promise<Feedback[]> {
+  getAll() {
     return this.feedbackService.getAll();
   }
 
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  getById(@Param('id') id: string): Promise<Feedback> {
-    return this.feedbackService.getById(id);
-  }
-
+  @ApiOperation({ summary: 'Create new feedback' })
+  @ApiResponse({ status: 200, type: Feedback })
+  @UsePipes(ValidationPipe)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
-    return this.feedbackService.create(createFeedbackDto);
+  create(@Body() feedbackDto: CreateFeedbackDto) {
+    return this.feedbackService.create(feedbackDto);
   }
 }
